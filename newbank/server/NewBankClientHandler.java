@@ -22,7 +22,7 @@ public class NewBankClientHandler extends Thread{
 	public void run() {
 		// keep getting requests from the client and processing them
 		try {
-			// ask for user name
+			// ask for username
 			out.println("Enter Username");
 			String userName = in.readLine();
 			// ask for password
@@ -37,8 +37,8 @@ public class NewBankClientHandler extends Thread{
 				while(true) {
 					String request = in.readLine();
 					System.out.println("Request from " + customer.getKey());
-					String responce = bank.processRequest(customer, request);
-					out.println(responce);
+					String response = bank.processRequest(customer, request);
+					out.println(response);
 				}
 			}
 			else {
