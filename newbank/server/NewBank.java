@@ -49,6 +49,7 @@ public class NewBank {
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			switch(request) {
+			case "HELP" : return listOptions();
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 			default : return "FAIL";
 			}
@@ -58,6 +59,22 @@ public class NewBank {
 
 	private String showMyAccounts(CustomerID customer) {
 		return (customers.get(customer.getKey())).accountsToString();
+	}
+
+	private String listOptions() {
+		String newLine = System.getProperty("line.separator");
+
+		return "Option 1 : Show balance"
+				.concat(newLine)
+				.concat("Option 2 : Add balance")
+				.concat(newLine)
+				.concat("Option 3 : Withdraw balance")
+				.concat(newLine)
+				.concat("Option 4 : Transfer balance")
+				.concat(newLine)
+				.concat("Option 5 : Send money/pay bill")
+				.concat(newLine)
+				.concat("Option 6 : Apply for loan");
 	}
 
 }
