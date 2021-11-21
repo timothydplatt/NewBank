@@ -13,15 +13,15 @@ public class NewBank {
 	}
 	
 	private void addTestData() {
-		Customer bhagy = new Customer();
+		Customer bhagy = new Customer("Bhagy", "Bhagy123");
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put("Bhagy", bhagy);
 		
-		Customer christina = new Customer();
+		Customer christina = new Customer("Christina", "Christina123");
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put("Christina", christina);
 		
-		Customer john = new Customer();
+		Customer john = new Customer("John", "John123");
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
 	}
@@ -29,12 +29,20 @@ public class NewBank {
 	public static NewBank getBank() {
 		return bank;
 	}
-	
+
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if(customers.containsKey(userName)) {
+		if(userNameExists(userName) && customersPasswordIsCorrect(userName,password)) {
 			return new CustomerID(userName);
 		}
 		return null;
+	}
+
+	private boolean userNameExists(String userName) {
+		return customers.containsKey(userName);
+	}
+
+	private boolean customersPasswordIsCorrect(String userName, String password) {
+		return customers.get(userName).validatePassword(password);
 	}
 
 	// commands from the NewBank customer are processed in this method
@@ -47,7 +55,7 @@ public class NewBank {
 		}
 		return "FAIL";
 	}
-	
+
 	private String showMyAccounts(CustomerID customer) {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
