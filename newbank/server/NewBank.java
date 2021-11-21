@@ -53,6 +53,13 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+	public String createNewCustomer(String username, String password) {
+		Customer newCustomer = new Customer();
+		newCustomer.addAccount(new Account("Checking", 0.0));
+		customers.put(username, newCustomer);
+		return("Account created" + username);
+	}
+
 	private String listOptions() {
 		String newLine = System.getProperty("line.separator");
 
