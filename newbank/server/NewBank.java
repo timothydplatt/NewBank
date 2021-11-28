@@ -122,7 +122,7 @@ public class NewBank {
 			default : return "FAIL";
 			}
 //		}
-		return "FAIL";
+//		return "FAIL";
 	}
 
 //	private String showMyAccounts(CustomerID customer) {
@@ -222,8 +222,7 @@ public class NewBank {
 	public Customer getCustomer(String email, String password) {
 
 		String sql = "SELECT * FROM customer WHERE email = ? AND password = ? ";
-		Customer customer;
-
+//		Customer customer("");
 		try (Connection conn = this.connect();
 			 PreparedStatement pstmt  = conn.prepareStatement(sql)){
 
@@ -233,20 +232,37 @@ public class NewBank {
 			//
 			ResultSet rs  = pstmt.executeQuery();
 
-			// loop through the result set
-			while (rs.next()) {
-				System.out.println(rs.getInt("id") +  "\t" +
-						rs.getString("firstName") + "\t" +
-						rs.getString("lastName"));
+			if (!rs.isBeforeFirst() ) {
+				return null;
+			} else {
+				Customer customer = new Customer();
+				while (rs.next()) {
+					customer.id = rs.getInt("id");
+					customer.firstName = rs.getString("firstName");
+					customer.lastName = rs.getString("lastName");
+					customer.dateOfBirth = rs.getString("lastName");
+					customer.email = rs.getString("lastName");
+					customer.phoneNumber = rs.getInt("lastName");
+					customer.password = rs.getString("password");
+				}
+				return customer;
 			}
+
+			// loop through the result set
+//			while (rs.next()) {
+//				System.out.println(rs.getInt("id") +  "\t" +
+//						rs.getString("firstName") + "\t" +
+//						rs.getString("lastName"));
+//			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
+			return null;
 		}
 
-		Customer newCustomer = new Customer(username,password);
-		newCustomer.addAccount(new Account("Checking", 0.0));
-		customers.put(username, newCustomer);
-		return("Account created" + username);
+//		Customer newCustomer = new Customer(username,password);
+//		newCustomer.addAccount(new Account("Checking", 0.0));
+//		customers.put(username, newCustomer);
+//		return("Account created" + username);
 	}
 
 }
