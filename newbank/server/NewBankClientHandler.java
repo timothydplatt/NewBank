@@ -49,8 +49,8 @@ public class NewBankClientHandler extends Thread{
 				newCustomerUserName = in.readLine();
 				out.println("Enter a password:");
 				newCustomerPassword = in.readLine();
-				String result = bank.createNewCustomer(newCustomerUserName, newCustomerPassword);
-				out.println(result);
+//				String result = bank.createNewCustomer(newCustomerUserName, newCustomerPassword);
+//				out.println(result);
 				customerType = "1";
 				run();
 			} catch (IOException e) {
@@ -69,13 +69,16 @@ public class NewBankClientHandler extends Thread{
 			String password = in.readLine();
 			out.println("Checking Details...");
 			// authenticate user and get customer ID token from bank for use in subsequent requests
-			CustomerID customer = bank.checkLogInDetails(userName, password);
+			Customer customer = bank.checkLogInDetails(userName, password);
 			// if the user is authenticated then get requests from the user and process them 
 			if(customer != null) {
 				out.println("Log In Successful. What do you want to do?");
+				out.println("You have the following options:");
+				String options = bank.processRequest(customer, "HELP");
+				out.println(options);
 				while(true) {
 					String request = in.readLine();
-					System.out.println("Request from " + customer.getKey());
+					System.out.println("Request from " + customer.id);
 					String response = bank.processRequest(customer, request);
 					out.println(response);
 				}
