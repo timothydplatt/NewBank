@@ -3,13 +3,13 @@ package newbank.server;
 import java.util.ArrayList;
 
 public class Customer {
-	private int id; //Should this be a String?
-	private String firstName;
-	private String lastName;
-	private String dateOfBirth;
-	private String email;
-	private int phoneNumber;
-	private String password;
+	public int id; //Should this be a String?
+	public String firstName;
+	public String lastName;
+	public String dateOfBirth;
+	public String email;
+	public int phoneNumber;
+	public String password;
 //	private ArrayList<Account> accounts;
 	
 	public Customer(int id, String firstName, String lastName, String dateOfBirth, String email, int phoneNumber, String password) {
@@ -22,7 +22,17 @@ public class Customer {
 		this.password = password;
 //		accounts = new ArrayList<>();
 	}
-	
+
+	public Customer() {
+		this.id = 0;
+		this.firstName = "";
+		this.lastName = "";
+		this.dateOfBirth = "";
+		this.email = "";
+		this.phoneNumber = 0;
+		this.password = "";
+	}
+
 //	public String accountsToString() {
 //		String s = "";
 //		for(Account a : accounts) {
