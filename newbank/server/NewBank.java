@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class NewBank {
 
 	private static final NewBank bank = new NewBank();
-	private HashMap<String,Customer> customers;
+	private HashMap<String, newbank.server.Customer> customers;
 	
 	private NewBank() {
 		customers = new HashMap<>();
@@ -68,37 +68,37 @@ public class NewBank {
 //		john.addAccount(new Account("Checking", 250.0));
 //		customers.put("John", john);
 
-		Customer tim = new Customer(1, "Tim", "Platt", "01/01/1988","timothy@gmail.com", 07777777777,"timothy123");
+		newbank.server.Customer tim = new newbank.server.Customer(1, "Tim", "Platt", "01/01/1988","timothy@gmail.com", 07777777777,"timothy123");
 		customers.put("Tim", tim);
 
 //		selectAll();
 //		getUserByEmail("timothy@gmail.com");
 //		getUserByEmail("william@gmail.com");
 
-//		System.out.println(userWithEmailExists("timothy@gmail.com"));
-//		System.out.println(userWithEmailExists("timothy@gmai.com"));
-//		System.out.println(userWithEmailExists("sarah@gmail.com"));
-//		System.out.println(userWithEmailExists("sarha@gmail.com"));
-//		System.out.println(userWithEmailExists("william@gmail.com"));
-//		System.out.println(userWithEmailExists(""));
-//
-//		System.out.println(passwordMatchesForEmail("timothy@gmail.com", "timothy123"));
-//		System.out.println(passwordMatchesForEmail("timothy@gmai.com", "timothy123"));
-//		System.out.println(passwordMatchesForEmail("timothy@gmail.com", "timothy12"));
+		System.out.println(userWithEmailExists("timothy@gmail.com"));
+		System.out.println(userWithEmailExists("timothy@gmai.com"));
+		System.out.println(userWithEmailExists("sarah@gmail.com"));
+		System.out.println(userWithEmailExists("sarha@gmail.com"));
+		System.out.println(userWithEmailExists("william@gmail.com"));
+		System.out.println(userWithEmailExists(""));
+
+		System.out.println(passwordMatchesForEmail("timothy@gmail.com", "timothy123"));
+		System.out.println(passwordMatchesForEmail("timothy@gmai.com", "timothy123"));
+		System.out.println(passwordMatchesForEmail("timothy@gmail.com", "timothy12"));
 	}
 	
 	public static NewBank getBank() {
 		return bank;
 	}
 
-	public synchronized Customer checkLogInDetails(String userName, String password) {
+	public synchronized newbank.server.Customer checkLogInDetails(String userName, String password) {
 //		if(userNameExists(userName) && customersPasswordIsCorrect(userName,password)) {
 //			return new CustomerID(userName);
 //		}
 //		return null;
 
 		if(userWithEmailExists(userName) && passwordMatchesForEmail(userName,password)) {
-			Customer customer = getCustomer(userName,password);
+			newbank.server.Customer customer = getCustomer(userName,password);
 			return customer;
 //			return new CustomerID(userName);
 		}
@@ -114,7 +114,7 @@ public class NewBank {
 	}
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(Customer customer, String request) {
+	public synchronized String processRequest(newbank.server.Customer customer, String request) {
 //		if(customers.containsKey(customer.id)) {
 			switch(request) {
 			case "HELP" : return listOptions();
@@ -219,7 +219,7 @@ public class NewBank {
 		}
 	}
 
-	public Customer getCustomer(String email, String password) {
+	public newbank.server.Customer getCustomer(String email, String password) {
 
 		String sql = "SELECT * FROM customer WHERE email = ? AND password = ? ";
 //		Customer customer("");
@@ -235,7 +235,7 @@ public class NewBank {
 			if (!rs.isBeforeFirst() ) {
 				return null;
 			} else {
-				Customer customer = new Customer();
+				newbank.server.Customer customer = new newbank.server.Customer();
 				while (rs.next()) {
 					customer.id = rs.getInt("id");
 					customer.firstName = rs.getString("firstName");
