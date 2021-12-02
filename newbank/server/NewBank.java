@@ -1,268 +1,355 @@
-package newbank.server;
+package server;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-//import java.sql.SQLException;
 import java.sql.*;
-import java.util.HashMap;
-import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class NewBank {
 
-	private static final NewBank bank = new NewBank();
-	private HashMap<String, newbank.server.Customer> customers;
-	
-	private NewBank() {
-		customers = new HashMap<>();
-		addTestData();
-	}
+    //private static final NewBank bank = new NewBank();
+    //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-	// Creating an object of Gson class
-	Gson gson = new Gson();
+    public String listOptions() {
+        String newLine = System.getProperty("line.separator");
 
-	private Connection connect() {
-		// SQLite connection string
-		String url = "jdbc:sqlite:newBank.db";
-		Connection connection = null;
-		try {
-			connection = DriverManager.getConnection(url);
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return connection;
-	}
+        return "Option 1 : Show balance"
+                .concat(newLine)
+                .concat("Option 2 : Add balance")
+                .concat(newLine)
+                .concat("Option 3 : Withdraw balance")
+                .concat(newLine)
+                .concat("Option 4 : Transfer balance")
+                .concat(newLine)
+                .concat("Option 5 : Send money/pay bill")
+                .concat(newLine)
+                .concat("Option 6 : Create Bank Account")
+                .concat(newLine)
+                .concat("Option 7 : Apply for loan")
+                .concat(newLine)
+                .concat("Option 8 : Logout");
+    }
 
-	public void selectAll(){
-		String sql = "SELECT * FROM customer";
+    private Connection connect() {
+        // SQLite connection string
+        String url = "jdbc:sqlite:newBank.db";
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return connection;
+    }
 
-		try (Connection conn = this.connect();
-			 Statement stmt  = conn.createStatement();
-			 ResultSet rs    = stmt.executeQuery(sql)){
+    public Boolean verifyUser(String email) {
+        String sql = "SELECT * FROM customer WHERE email = ? ";
+        System.out.println("User Verification request for email: " + email);
 
-			// loop through the result set
-			while (rs.next()) {
-				System.out.println(rs.getInt("id") +  "\t" +
-						rs.getString("firstName") + "\t" +
-						rs.getString("lastName"));
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-	private void addTestData() {
+            // set the value
+            pstmt.setString(1, email);
+            //
+            ResultSet rs = pstmt.executeQuery();
 
-//		Customer bhagy = new Customer("Bhagy", "Bhagy123");
-//		bhagy.addAccount(new Account("Main", 1000.0));
-//		customers.put("Bhagy", bhagy);
-		// Generating json from emp object
+            if (!rs.isBeforeFirst())
+                return false;
+            else
+                return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-//		String custJson = gson.toJson(bhagy);
-//		System.out.println("Emp json is " + custJson);
-//
-//		Customer christina = new Customer("Christina", "Christina123");
-//		christina.addAccount(new Account("Savings", 1500.0));
-//		customers.put("Christina", christina);
-//
-//		Customer john = new Customer("John", "John123");
-//		john.addAccount(new Account("Checking", 250.0));
-//		customers.put("John", john);
+    public Customer getCustomer(String email, String password) {
 
-		newbank.server.Customer tim = new newbank.server.Customer(1, "Tim", "Platt", "01/01/1988","timothy@gmail.com", 07777777777,"timothy123");
-		customers.put("Tim", tim);
+        String sql = "SELECT * FROM customer WHERE email = ? AND password = ? ";
+        System.out.println("Login Request for email: " + email + ", password: " + password);
 
-//		selectAll();
-//		getUserByEmail("timothy@gmail.com");
-//		getUserByEmail("william@gmail.com");
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-		System.out.println(userWithEmailExists("timothy@gmail.com"));
-		System.out.println(userWithEmailExists("timothy@gmai.com"));
-		System.out.println(userWithEmailExists("sarah@gmail.com"));
-		System.out.println(userWithEmailExists("sarha@gmail.com"));
-		System.out.println(userWithEmailExists("william@gmail.com"));
-		System.out.println(userWithEmailExists(""));
+            // set the value
+            pstmt.setString(1, email);
+            pstmt.setString(2, password);
 
-		System.out.println(passwordMatchesForEmail("timothy@gmail.com", "timothy123"));
-		System.out.println(passwordMatchesForEmail("timothy@gmai.com", "timothy123"));
-		System.out.println(passwordMatchesForEmail("timothy@gmail.com", "timothy12"));
-	}
-	
-	public static NewBank getBank() {
-		return bank;
-	}
+            //Execute query
+            ResultSet rs = pstmt.executeQuery();
 
-	public synchronized newbank.server.Customer checkLogInDetails(String userName, String password) {
-//		if(userNameExists(userName) && customersPasswordIsCorrect(userName,password)) {
-//			return new CustomerID(userName);
-//		}
-//		return null;
+            if (!rs.isBeforeFirst()) {
+                System.out.println("Email/Password combination not found");
+                return null;
+            } else {
+                Customer customer = new Customer();
+                while (rs.next()) {
+                    customer.id = rs.getInt("id");
+                    customer.firstName = rs.getString("firstName");
+                    customer.lastName = rs.getString("lastName");
+                    customer.dateOfBirth = rs.getString("dateOfBirth");
+                    customer.email = rs.getString("email");
+                    customer.phoneNumber = rs.getInt("phoneNumber");
+                    customer.password = rs.getString("password");
+                }
+                System.out.println("Email/Password combination found");
+                return customer;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-		if(userWithEmailExists(userName) && passwordMatchesForEmail(userName,password)) {
-			newbank.server.Customer customer = getCustomer(userName,password);
-			return customer;
-//			return new CustomerID(userName);
-		}
-		return null;
-	}
+    public Account getAccount(int customerID, String accountType) {
 
-	private boolean userNameExists(String userName) {
-		return customers.containsKey(userName);
-	}
+        String sql = "SELECT * FROM account WHERE customerID = ? AND accountType = ? ";
+        System.out.println("Get Account Request for customerID: " + customerID + ", accountType: " + accountType);
 
-	private boolean customersPasswordIsCorrect(String userName, String password) {
-		return customers.get(userName).validatePassword(password);
-	}
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(newbank.server.Customer customer, String request) {
-//		if(customers.containsKey(customer.id)) {
-			switch(request) {
-			case "HELP" : return listOptions();
-//			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
-			default : return "FAIL";
-			}
-//		}
-//		return "FAIL";
-	}
+            // set the value
+            pstmt.setInt(1, customerID);
+            pstmt.setString(2, accountType);
+            //Execute Query
+            ResultSet rs = pstmt.executeQuery();
 
-//	private String showMyAccounts(CustomerID customer) {
-//		return (customers.get(customer.getKey())).accountsToString();
-//	}
+            if (!rs.isBeforeFirst()) {
+                System.out.println("customerID/accountType combination not found");
+                return null;
+            } else {
+                Account account = new Account();
+                while (rs.next()) {
+                    account.accountNumber = rs.getInt("accountNumber");
+                    account.customerID = rs.getInt("customerID");
+                    account.balance = rs.getDouble("balance");
+                    account.accountType = rs.getString("accountType");
+                    account.openDate = rs.getString("openDate");
+                }
+                System.out.println("customerID/accountType combination found");
+                return account;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-//	public String createNewCustomer(String username, String password) {
-//		Customer newCustomer = new Customer(username,password);
-//		newCustomer.addAccount(new Account("Checking", 0.0));
-//		customers.put(username, newCustomer);
-//		return("Account created" + username);
-//	}
+    public String createUserAccount(String firstName, String lastName, String dateOfBirth, String userName, int phoneNumber, String password) {
+        String sql = "insert into customer (firstName, lastName, dateOfBirth, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?, ?)";
+        System.out.println("Create User account request for userName: " + userName);
 
-	private String listOptions() {
-		String newLine = System.getProperty("line.separator");
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            // set the value
+            pstmt.setString(1, firstName);
+            pstmt.setString(2, lastName);
+            pstmt.setString(3, dateOfBirth);
+            pstmt.setString(4, userName);
+            pstmt.setString(5, String.valueOf(phoneNumber));
+            pstmt.setString(6, password);
 
-		return "Option 1 : Show balance"
-				.concat(newLine)
-				.concat("Option 2 : Add balance")
-				.concat(newLine)
-				.concat("Option 3 : Withdraw balance")
-				.concat(newLine)
-				.concat("Option 4 : Transfer balance")
-				.concat(newLine)
-				.concat("Option 5 : Send money/pay bill")
-				.concat(newLine)
-				.concat("Option 6 : Apply for loan");
-	}
+            //Execute Statement and return
+            return "Welcome User : '" + userName + "', Your User creation request Status (0: Failure, 1: Success): " + pstmt.executeUpdate();
 
-//	public void getUserByEmail(String email) {
-//		String sql = "SELECT * FROM customer WHERE email = ? ";
-//
-//		try (Connection conn = this.connect();
-//			 PreparedStatement pstmt  = conn.prepareStatement(sql)){
-//
-//			// set the value
-//			pstmt.setString(1, email);
-//			//
-//			ResultSet rs  = pstmt.executeQuery();
-//
-//			// loop through the result set
-//			while (rs.next()) {
-//				System.out.println(rs.getInt("id") +  "\t" +
-//						rs.getString("firstName") + "\t" +
-//						rs.getString("lastName"));
-//			}
-//		} catch (SQLException e) {
-//			System.out.println(e.getMessage());
-//		}
-//	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "User : '" + userName + "', creation request failed. Reason: " + e.getMessage();
+        }
+    }
 
-	public Boolean userWithEmailExists(String email) {
-		String sql = "SELECT * FROM customer WHERE email = ? ";
+    public String createBankAccount(Customer customer, String accountType) {
+        String sql = "insert into account (customerID, balance, accountType, openDate) VALUES (?, 00.00, ?, ?)";
 
-		try (Connection conn = this.connect();
-			 PreparedStatement pstmt  = conn.prepareStatement(sql)){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localDate = LocalDate.now();
+        System.out.println("Bank Account Creation request for Customer ID: " + customer.id + " for Account Type: " + accountType + " on Date time: " + dtf.format(localDate));
 
-			// set the value
-			pstmt.setString(1, email);
-			//
-			ResultSet rs  = pstmt.executeQuery();
+        //Verify user account creation request
+        Account acc = getAccount(customer.id, accountType);
+        if (acc != null) {
+            System.out.println("Account ID: " + acc.accountNumber + " of accountType: " + acc.accountType + " for Customer ID: " + acc.customerID + ", already exists");
+            return "Account Creation request for CustomerID: " + customer.id + ", failed; as accountType: " + accountType + " with accountNumber: " + acc.accountNumber + " already exists for Customer";
+        } else {
+            try (Connection conn = this.connect();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                // set the value
+                pstmt.setString(1, String.valueOf(customer.id));
+                pstmt.setString(2, accountType);
+                pstmt.setString(3, dtf.format(localDate));
+                System.out.println("Account creation request for accountType: " + accountType + " for Customer ID:" + customer.id + ", created successfully");
 
-			if (!rs.isBeforeFirst() ) {
-				return false;
-			} else {
-				return true;
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
-		}
-	}
+                //Execute Statement and return
+                return "Account Creation request for CustomerID :" + customer.id + ", successful. Status (0: Failure, 1: Success): " + pstmt.executeUpdate();
 
-	public Boolean passwordMatchesForEmail(String email, String password) {
-		String sql = "SELECT * FROM customer WHERE email = ? AND password = ?";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Account Creation request for CustomerID :" + customer.id + ", failed. Reason: " + e.getMessage();
+            }
+        }
+    }
 
-		try (Connection conn = this.connect();
-			 PreparedStatement pstmt  = conn.prepareStatement(sql)){
+    public String showAccountBalance(int customerID) {
+        String sql = "SELECT * FROM account WHERE customerID = ?";
+        System.out.println("Show account(s) request for customerID: " + customerID);
 
-			// set the value
-			pstmt.setString(1, email);
-			pstmt.setString(2, password);
-			//
-			ResultSet rs  = pstmt.executeQuery();
+        String statement = "";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			if (!rs.isBeforeFirst() ) {
-				return false;
-			} else {
-				return true;
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
-		}
-	}
+            // set the value
+            pstmt.setInt(1, customerID);
+            //Execute Query
+            ResultSet rs = pstmt.executeQuery();
 
-	public newbank.server.Customer getCustomer(String email, String password) {
+            if (!rs.isBeforeFirst()) {
+                statement = "No Bank account(s) found for customerID: " + customerID;
+            } else {
+                statement = "Account(s) details for customerID '" + customerID + "': \n\n";
+                while (rs.next()) {
+                    statement = statement + "accountNumber: " + rs.getInt("accountNumber") + ","
+                            + " accountType: " + rs.getString("accountType") + "\n"
+                            + "accountOpeningDate: " + rs.getString("openDate") + ","
+                            + " availableBalance: " + rs.getDouble("balance") + "\n\n";
+                }
+                return statement;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Show account(s) balance request for CustomerID :" + customerID + ", failed. Reason: " + e.getMessage();
+        }
+        return statement;
+    }
 
-		String sql = "SELECT * FROM customer WHERE email = ? AND password = ? ";
-//		Customer customer("");
-		try (Connection conn = this.connect();
-			 PreparedStatement pstmt  = conn.prepareStatement(sql)){
+    public String cashTransaction(int customerID, int accountNumber, double amount) {
+        String sql = "SELECT * FROM account WHERE customerID = ? and accountNumber = ?";
+        System.out.println("cashTransaction request for customerID: " + customerID+" and accountNumber: "+accountNumber);
 
-			// set the value
-			pstmt.setString(1, email);
-			pstmt.setString(2, password);
-			//
-			ResultSet rs  = pstmt.executeQuery();
+        String statement = null;
+        try (Connection conn = this.connect()) {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            // set the value
+            pstmt.setInt(1, customerID);
+            pstmt.setInt(2, accountNumber);
+            //Execute Query
+            ResultSet rs = pstmt.executeQuery();
 
-			if (!rs.isBeforeFirst() ) {
-				return null;
-			} else {
-				newbank.server.Customer customer = new newbank.server.Customer();
-				while (rs.next()) {
-					customer.id = rs.getInt("id");
-					customer.firstName = rs.getString("firstName");
-					customer.lastName = rs.getString("lastName");
-					customer.dateOfBirth = rs.getString("lastName");
-					customer.email = rs.getString("lastName");
-					customer.phoneNumber = rs.getInt("lastName");
-					customer.password = rs.getString("password");
-				}
-				return customer;
-			}
+            if (!rs.isBeforeFirst()) {
+                statement = "Bank accountNumber/customerID combination invalid: "+accountNumber+"/"+customerID+"\n";
+            } else {
+                double accountBalance = rs.getDouble("balance");
 
-			// loop through the result set
-//			while (rs.next()) {
-//				System.out.println(rs.getInt("id") +  "\t" +
-//						rs.getString("firstName") + "\t" +
-//						rs.getString("lastName"));
-//			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return null;
-		}
+                //Account Update Statement
+                String sqlUp = "UPDATE account SET balance = ? WHERE customerID = ? and accountNumber = ?";
+                PreparedStatement pstmtUp = conn.prepareStatement(sqlUp);
+                double newAccountBalance = Math.round((accountBalance+amount) * 100.0) / 100.0;
+                // set the value
+                pstmtUp.setDouble(1, newAccountBalance);
+                pstmtUp.setInt(2, customerID);
+                pstmtUp.setInt(3, accountNumber);
+                //Execute Update account Query
+                pstmtUp.executeUpdate();
 
-//		Customer newCustomer = new Customer(username,password);
-//		newCustomer.addAccount(new Account("Checking", 0.0));
-//		customers.put(username, newCustomer);
-//		return("Account created" + username);
-	}
+                if(amount>0)
+                    statement = "\nFor accountNumber: " + rs.getInt("accountNumber") + "\n"
+                            + "oldAccountBalance: " + accountBalance + "\n"
+                            + "amountAdded: " + amount + "\n"
+                            + "newAccountBalance: " + newAccountBalance + "\n";
+                else
+                    statement = "\nFor accountNumber: " + rs.getInt("accountNumber") + "\n"
+                            + "oldAccountBalance: " + accountBalance + "\n"
+                            + "amountWithdrawn: " + amount + "\n"
+                            + "newAccountBalance: " + newAccountBalance + "\n";
 
+                return statement;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "cashTransaction request for CustomerID :" + customerID + ", failed. Reason: " + e.getMessage();
+        }
+        return statement;
+    }
+
+    public String accountTransaction(int fromCustomerID, int fromAccountNumber, double amount, int toCustomerID, int toAccountNumber) {
+        String sqlFrom = "SELECT * FROM account WHERE customerID = ? and accountNumber = ?";
+        String sqlTo = "SELECT * FROM account WHERE customerID = ? and accountNumber = ?";
+
+        System.out.println("accountTransaction request for fromCustomerID: " + fromCustomerID+" - fromAccountNumber:"+fromAccountNumber
+                +" to toCustomerID: "+toCustomerID+" - toAccountNumber:"+toAccountNumber);
+
+        String statement = null;
+        try (Connection conn = this.connect()) {
+            PreparedStatement pstmtFrom = conn.prepareStatement(sqlFrom);
+            PreparedStatement pstmtTo = conn.prepareStatement(sqlTo);
+
+            // set the value
+            pstmtFrom.setInt(1, fromCustomerID);
+            pstmtFrom.setInt(2, fromAccountNumber);
+            pstmtTo.setInt(1, toCustomerID);
+            pstmtTo.setInt(2, toAccountNumber);
+
+            //Execute Query
+            ResultSet rsFrom = pstmtFrom.executeQuery();
+            ResultSet rsTo = pstmtTo.executeQuery();
+
+            if (!rsFrom.isBeforeFirst()) {
+                statement = "Bank fromAccountNumber/fromCustomerID combination invalid: "+fromAccountNumber+"/"+fromCustomerID+"\n";
+            } else if (!rsTo.isBeforeFirst()) {
+                statement = "Bank toAccountNumber/toCustomerID combination invalid: "+toAccountNumber+"/"+toCustomerID+"\n";
+            } else {
+                double fromAccountBalance = rsFrom.getDouble("balance");
+                double toAccountBalance = rsTo.getDouble("balance");
+                double newFromAccountBalance = Math.round((fromAccountBalance-amount) * 100.0) / 100.0;
+                double newToAccountBalance = Math.round((toAccountBalance+amount) * 100.0) / 100.0;
+
+                //Account Update Statement
+                String sqlUpFrom = "UPDATE account SET balance = ? WHERE customerID = ? and accountNumber = ?";
+                String sqlUpTo = "UPDATE account SET balance = ? WHERE customerID = ? and accountNumber = ?";
+                PreparedStatement pstmtUpFrom = conn.prepareStatement(sqlUpFrom);
+                PreparedStatement pstmtUpTo = conn.prepareStatement(sqlUpTo);
+
+                // set the value
+                pstmtUpFrom.setDouble(1, (newFromAccountBalance));
+                pstmtUpFrom.setInt(2, fromCustomerID);
+                pstmtUpFrom.setInt(3, fromAccountNumber);
+                pstmtUpTo.setDouble(1, (newToAccountBalance));
+                pstmtUpTo.setInt(2, toCustomerID);
+                pstmtUpTo.setInt(3, toAccountNumber);
+                //Execute Update account Query
+                pstmtUpFrom.executeUpdate();
+                pstmtUpTo.executeUpdate();
+
+                if(fromCustomerID==toCustomerID){
+                    statement = "\nIntra-Bank Transaction for customerID: "+fromCustomerID+"\n"
+                            +"TransferAmount: " +amount+"\n"
+                            +"Transferred fromAccountNumber: " + rsFrom.getInt("accountNumber") + "\n"
+                            +"Old accountBalance: " + (fromAccountBalance) +", New accountBalance: " + (newFromAccountBalance) + "\n"
+                            +"Transferred toAccountNumber: " + rsTo.getInt("accountNumber") + "\n"
+                            +"Old accountBalance: " + (toAccountBalance) +", New accountBalance: " + (newToAccountBalance) + "\n";
+                }else{
+                    statement = "\nInter-Bank Transaction: \n"
+                            +"TransferAmount: " +amount+"\n"
+                            +"Transferred fromCustomerID/fromAccountNumber: " + rsFrom.getInt("customerID")+"/"+rsFrom.getInt("accountNumber") + "\n"
+                            +"Old accountBalance: " + (fromAccountBalance) +", New accountBalance: " + (newFromAccountBalance) + "\n"
+                            +"Transferred toCustomerID/toAccountNumber: " + rsTo.getInt("customerID")+"/"+rsTo.getInt("accountNumber") + "\n"
+                            +"Old accountBalance: " + (toAccountBalance) +", New accountBalance: " + (newToAccountBalance) + "\n";
+                }
+
+
+                return statement;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "accountTransaction request for CustomerID: " + fromCustomerID + ", failed. Reason: " + e.getMessage();
+        }
+        return statement;
+    }
+
+    /*public static void main(String[] args) {
+        NewBank bank = new NewBank();
+        //System.out.println("***"+bank.createAccount("Tom", "Jerry", "21/01/1992", "tom@gmail.com", 87585858, "tom123"));
+        Customer cust = bank.getCustomer("johnny@gmail.com", "johnny123");
+        System.out.println("***" + cust.firstName);
+    }*/
 }

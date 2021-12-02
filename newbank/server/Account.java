@@ -1,17 +1,26 @@
-package newbank.server;
+package server;
 
 public class Account {
-	
-	private String accountName;
-	private double openingBalance;
+	public int accountNumber;
+	public int customerID;
+	public double balance;
+	public String accountType;
+	public String openDate;
 
-	public Account(String accountName, double openingBalance) {
-		this.accountName = accountName;
-		this.openingBalance = openingBalance;
+	public Account(int accountNumber, int customerID, double balance, String accountType, String openDate) {
+		this.accountNumber = accountNumber;
+		this.customerID = customerID;
+		this.balance = balance;
+		this.accountType = accountType;
+		this.accountType = openDate;
 	}
-	
-	public String toString() {
-		return (accountName + ": " + openingBalance);
+
+	public Account() {
+		this.accountNumber = 0;
+		this.customerID = 0;
+		this.balance = 0;
+		this.accountType = "";
+		this.accountType = "";
 	}
 
 }
