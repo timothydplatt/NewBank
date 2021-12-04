@@ -1,4 +1,4 @@
-package newbank.server;
+package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,7 +21,7 @@ public class NewBankServer extends Thread{
 				NewBankClientHandler clientHandler = new NewBankClientHandler(s);
 				clientHandler.start();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		finally {

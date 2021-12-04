@@ -1,16 +1,13 @@
-package newbank.server;
-
-import java.util.ArrayList;
+package server;
 
 public class Customer {
-	public int id; //Should this be a String?
+	public int id;
 	public String firstName;
 	public String lastName;
 	public String dateOfBirth;
 	public String email;
 	public int phoneNumber;
 	public String password;
-//	private ArrayList<Account> accounts;
 	
 	public Customer(int id, String firstName, String lastName, String dateOfBirth, String email, int phoneNumber, String password) {
 		this.id = id;
@@ -20,7 +17,6 @@ public class Customer {
 		this.email = email;
 		this.phoneNumber = phoneNumber;
 		this.password = password;
-//		accounts = new ArrayList<>();
 	}
 
 	public Customer() {
@@ -33,19 +29,4 @@ public class Customer {
 		this.password = "";
 	}
 
-//	public String accountsToString() {
-//		String s = "";
-//		for(Account a : accounts) {
-//			s += a.toString();
-//		}
-//		return s;
-//	}
-
-	public Boolean validatePassword (String password) {
-		return this.password.equals(password);
-	}
-
-//	public void addAccount(Account account) {
-//		accounts.add(account);
-//	}
 }

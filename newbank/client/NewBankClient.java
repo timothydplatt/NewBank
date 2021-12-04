@@ -1,4 +1,4 @@
-package newbank.client;
+package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,18 +6,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
-public class ExampleClient extends Thread{
+public class NewBankClient extends Thread{
 	
 	private Socket server;
 	private PrintWriter bankServerOut;	
 	private BufferedReader userInput;
 	private Thread bankServerResponseThread;
 	
-	public ExampleClient(String ip, int port) throws UnknownHostException, IOException {
+	public NewBankClient(String ip, int port) throws UnknownHostException, IOException {
 		server = new Socket(ip,port);
 		userInput = new BufferedReader(new InputStreamReader(System.in)); 
 		bankServerOut = new PrintWriter(server.getOutputStream(), true);
@@ -47,7 +44,7 @@ public class ExampleClient extends Thread{
 					String command = userInput.readLine();
 					bankServerOut.println(command);
 				}				
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -55,6 +52,6 @@ public class ExampleClient extends Thread{
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
-		new ExampleClient("localhost",14004).start();
+		new client.NewBankClient("localhost",14004).start();
 	}
 }
