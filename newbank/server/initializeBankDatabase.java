@@ -59,6 +59,7 @@ public class initializeBankDatabase {
             statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1001, 299.99, 'Savings', '03/01/2021')");
             statement.executeUpdate("insert into customer (firstName, LastName, dateOfBirth, email, phoneNumber, password) VALUES ('Popeye', 'Sailor Man', '31/01/1929', 'popeye@gmail.com', 07926535905, 'popeye123')");
             statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1002, 599.98, 'Loan', '01/01/2021')");
+            statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1002, 1000, 'Savings', '05/12/2021')");
 
             //Print Data in Customer Table
             ResultSet customer = statement.executeQuery("select * from customer");
