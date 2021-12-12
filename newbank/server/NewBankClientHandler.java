@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 public class NewBankClientHandler extends Thread {
 
@@ -13,8 +15,7 @@ public class NewBankClientHandler extends Thread {
     private BufferedReader in;
     private PrintWriter out;
 
-
-    public NewBankClientHandler(Socket s) throws IOException {
+    public NewBankClientHandler(Socket s) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
     }
@@ -50,22 +51,25 @@ public class NewBankClientHandler extends Thread {
                 String firstName = in.readLine();
                 out.println("Enter your Last Name:");
                 String lastName = in.readLine();
-                out.println("Enter your Date of Birth (in dd/mm/yyy format):");
+                out.println("Enter your Date of Birth (in dd/mm/yyyy format):");
                 String dateOfBirth = in.readLine();
                 out.println("Enter your Phone Number:");
                 String phoneNumber = in.readLine();
 
                 // verify the user if already exists
-                if (bank.verifyUser(userName))
+                if (bank.verifyUser(userName)) {
                     out.println("User : " + userName + " already exists, please try to login\n\n");
-                else
+                } else {
                     // Create account for the user
-                    out.println(bank.createUserAccount(firstName, lastName, dateOfBirth, userName, Integer.valueOf(phoneNumber), password) + "\n\n");
+                    String hashedPassword = PasswordHash.createHash(password);
+                    out.println("Hashed Password: " + hashedPassword);
 
-                //Relogin Option
-                customerTypeSelected = false;
-                run();
+                    out.println(bank.createUserAccount(firstName, lastName, dateOfBirth, userName, Integer.parseInt(phoneNumber), hashedPassword) + "\n\n");
 
+                    //Relogin Option
+                    customerTypeSelected = false;
+                    run();
+                }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
                 out.println("Invalid User Input, please try again.\n");
@@ -74,7 +78,6 @@ public class NewBankClientHandler extends Thread {
                 run();
             }
         }
-
 
         // keep getting requests from the client and processing them
         try {
@@ -87,8 +90,17 @@ public class NewBankClientHandler extends Thread {
             out.println("\nVerifying Details...\n");
             Thread.sleep(2000);
 
+            String storedHashedPassword = bank.getHashedPassword(userName);
+
+            boolean passwordMatch = PasswordHash.validatePassword(password, storedHashedPassword);
+            if (!passwordMatch) {
+                out.println("Incorrect password.\n");
+                customerTypeSelected = false;
+                run();
+            }
+
             // authenticate user and get customer ID token from bank for use in subsequent requests
-            customer = bank.getCustomer(userName, password);
+            customer = bank.getCustomer(userName);
             //System.out.println("***"+customer.firstName);
 
             // if the user is authenticated then get requests from the user and process them
@@ -112,54 +124,54 @@ public class NewBankClientHandler extends Thread {
                         case "2":
                             try {
                                 out.println("Enter AccountNumber to which you want AddBalance:");
-                                int accountNumber_a = Integer.valueOf(in.readLine());
+                                int accountNumber_a = Integer.parseInt(in.readLine());
                                 out.println("Enter Balance to Add:");
-                                float amount_a = Float.valueOf(in.readLine());
+                                float amount_a = Float.parseFloat(in.readLine());
                                 out.println(bank.cashTransaction(customer.id, accountNumber_a, amount_a) + "\n\n");
                                 continue;
-                            }catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 continue;
                             }
                         case "3":
                             try {
                                 out.println("Enter AccountNumber from which you want to WithdrawBalance:");
-                                int accountNumber_w = Integer.valueOf(in.readLine());
+                                int accountNumber_w = Integer.parseInt(in.readLine());
                                 out.println("Enter Balance to Withdraw:");
-                                float amount_w = Float.valueOf(in.readLine());
+                                float amount_w = Float.parseFloat(in.readLine());
                                 out.println(bank.cashTransaction(customer.id, accountNumber_w, (-amount_w)) + "\n\n");
                                 continue;
-                            } catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 continue;
                             }
                         case "4":
                             try {
                                 out.println("Enter AccountNumber from which you want to TransferBalance:");
-                                int fromAccountNumber = Integer.valueOf(in.readLine());
+                                int fromAccountNumber = Integer.parseInt(in.readLine());
                                 out.println("Enter AccountNumber to which you want to TransferBalance:");
-                                int toAccountNumber = Integer.valueOf(in.readLine());
+                                int toAccountNumber = Integer.parseInt(in.readLine());
                                 out.println("Enter Balance to Transfer:");
-                                float amount = Float.valueOf(in.readLine());
+                                float amount = Float.parseFloat(in.readLine());
                                 out.println(bank.accountTransaction(customer.id, fromAccountNumber, amount, customer.id, toAccountNumber) + "\n\n");
                                 continue;
-                            } catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 continue;
                             }
                         case "5":
                             try {
                                 out.println("Enter AccountNumber from which you want to TransferBalance:");
-                                int fromAccountNumber = Integer.valueOf(in.readLine());
+                                int fromAccountNumber = Integer.parseInt(in.readLine());
                                 out.println("Enter CustomerID to which you want to TransferBalance:");
-                                int toCustomerID = Integer.valueOf(in.readLine());
+                                int toCustomerID = Integer.parseInt(in.readLine());
                                 out.println("Enter AccountNumber to which you want to TransferBalance:");
-                                int toAccountNumber = Integer.valueOf(in.readLine());
+                                int toAccountNumber = Integer.parseInt(in.readLine());
                                 out.println("Enter Balance to Transfer:");
-                                float amount = Float.valueOf(in.readLine());
+                                float amount = Float.parseFloat(in.readLine());
                                 out.println(bank.accountTransaction(customer.id, fromAccountNumber, amount, toCustomerID, toAccountNumber) + "\n\n");
                                 continue;
-                            } catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 continue;
                             }
@@ -170,7 +182,7 @@ public class NewBankClientHandler extends Thread {
                             String choice = in.readLine();
                             if (choice.equals("1")) accountType = "Current";
                             else if (choice.equals("2")) accountType = "Savings";
-                            out.println(bank.createBankAccount(customer, accountType)+"\n\n");
+                            out.println(bank.createBankAccount(customer, accountType) + "\n\n");
                             continue;
                         case "7":
                             out.println("To be filled\n");
@@ -198,3 +210,4 @@ public class NewBankClientHandler extends Thread {
         }
     }
 }
+
