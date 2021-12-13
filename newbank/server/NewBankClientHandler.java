@@ -10,6 +10,12 @@ import java.security.spec.InvalidKeySpecException;
 
 public class NewBankClientHandler extends Thread {
 
+    /**
+     * NewBankClientHandler Class: Handling user’s request and input, invoking respective transaction/function to carry-out a banking task.
+     * Function run() is the main function performing user specific task/function.
+     * This function is also taking care of new user creation and their inputs.
+     */
+
     private NewBank bank = new NewBank();
     private Customer customer = new Customer();
     private BufferedReader in;
@@ -24,6 +30,10 @@ public class NewBankClientHandler extends Thread {
     String customerType = "";
 
     public void run() {
+        //Welcome Page
+        out.println("Welcome to Banking Portal");
+        out.println("-------------------------");
+
         // Ask user if they're an existing customer or a new customer.
         while (!customerTypeSelected) {
             out.println("If you're an existing customer press 1 to login.");

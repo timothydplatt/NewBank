@@ -6,8 +6,14 @@ import java.time.format.DateTimeFormatter;
 
 public class NewBank {
 
-    //private static final NewBank bank = new NewBank();
-    //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    /**
+     *NewBank Class: Constitutes of various Banking transaction specific functions like creating user account, bank account, show balance, transactions.
+     * 	Function createUserAccount() is used of creating new user banking account.
+     * Function createBankAccount() helps user create either Current or Saving account.
+     * Function showAccountBalance(), show all user’s account and available respective balances
+     * Function cashTransaction() is used for adding or withdrawing balance from a user’s account
+     * Function accountTransaction() does the banking transaction like transfer of amount between accounts inter or intra.
+     */
 
     public String listOptions() {
         String newLine = System.getProperty("line.separator");

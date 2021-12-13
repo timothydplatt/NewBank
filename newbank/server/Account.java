@@ -1,6 +1,11 @@
 package server;
 
 public class Account {
+
+	/**
+	 * Account Class: For creating respective class objects.
+	 */
+
 	public int accountNumber;
 	public int customerID;
 	public double balance;

@@ -8,7 +8,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class NewBankClient extends Thread{
-	
+
+	/**
+	 * NewBankClient Class: Client service connecting to server running on localhost: 14004
+	 */
+
 	private Socket server;
 	private PrintWriter bankServerOut;	
 	private BufferedReader userInput;

@@ -7,6 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class initializeBankDatabase {
+
+    /**
+     * initializeBankDatabase Class: Constitutes for initializing SQL Lite database tables account and customer, and add dummy data into respective tables.
+     */
+
     public initializeBankDatabase() {
         Connection connection = null;
         try {

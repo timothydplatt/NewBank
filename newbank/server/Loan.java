@@ -5,6 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Loan {
+    /**
+     * Loan Class: Used for handling loan functionalities for bank.
+     * It has features like loan request, loan approval and loan repayment.
+     */
     public int loanAccountNumber;
     public int id;
     public double loanAmount;
