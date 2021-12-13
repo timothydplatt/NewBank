@@ -158,7 +158,7 @@ public class NewBank {
         }
     }
 
-    public String createUserAccount(String firstName, String lastName, String dateOfBirth, String userName, int phoneNumber, String password) {
+    public String createUserAccount(String firstName, String lastName, String dateOfBirth, String userName, String phoneNumber, String password) {
         String sql = "insert into customer (firstName, lastName, dateOfBirth, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?, ?)";
         System.out.println("Create User account request for userName: " + userName);
 
@@ -167,9 +167,19 @@ public class NewBank {
             // set the value
             pstmt.setString(1, firstName);
             pstmt.setString(2, lastName);
-            pstmt.setString(3, dateOfBirth);
-            pstmt.setString(4, userName);
-            pstmt.setString(5, String.valueOf(phoneNumber));
+            if(dateOfBirth.contains("/"))
+                pstmt.setString(3, dateOfBirth);
+            else
+                throw new Exception("Invalid Date of Birth, please enter a valid DOB e.g. - '01/01/1990'");
+            if(userName.contains("@") && userName.contains("."))
+                pstmt.setString(4, userName);
+            else
+                throw new Exception("Invalid User Name, please enter a valid user e.g. - 'abc@test.com'");
+            try {
+                pstmt.setString(5, String.valueOf(Integer.parseInt(phoneNumber)));
+            }catch(Exception exp) {
+                throw new Exception("Invalid Phone Number, please enter a valid phone number e.g. - '123456789'");
+            }
             pstmt.setString(6, password);
 
             //Execute Statement and return
@@ -261,7 +271,9 @@ public class NewBank {
                 statement = "Bank accountNumber/customerID combination invalid: "+accountNumber+"/"+customerID+"\n";
             } else {
                 double accountBalance = rs.getDouble("balance");
-
+                //Verify account balance for transaction
+                if(amount<0 && accountBalance<(amount*-1))
+                    throw new Exception("Insufficient Balance.");
                 //Account Update Statement
                 String sqlUp = "UPDATE account SET balance = ? WHERE customerID = ? and accountNumber = ?";
                 PreparedStatement pstmtUp = conn.prepareStatement(sqlUp);
@@ -324,6 +336,10 @@ public class NewBank {
                 double toAccountBalance = rsTo.getDouble("balance");
                 double newFromAccountBalance = Math.round((fromAccountBalance-amount) * 100.0) / 100.0;
                 double newToAccountBalance = Math.round((toAccountBalance+amount) * 100.0) / 100.0;
+
+                //Verify account balance for transaction
+                if(fromAccountBalance<amount)
+                    throw new Exception("Insufficient Balance.");
 
                 //Account Update Statement
                 String sqlUpFrom = "UPDATE account SET balance = ? WHERE customerID = ? and accountNumber = ?";

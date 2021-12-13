@@ -59,13 +59,14 @@ public class NewBankClientHandler extends Thread {
                 // verify the user if already exists
                 if (bank.verifyUser(userName)) {
                     out.println("User : " + userName + " already exists, please try to login\n\n");
+                    //Relogin Option
+                    customerTypeSelected = false;
+                    run();
                 } else {
                     // Create account for the user
                     String hashedPassword = PasswordHash.createHash(password);
-                    out.println("Hashed Password: " + hashedPassword);
-
-                    out.println(bank.createUserAccount(firstName, lastName, dateOfBirth, userName, Integer.parseInt(phoneNumber), hashedPassword) + "\n\n");
-
+                    //out.println("Hashed Password: " + hashedPassword);
+                    out.println(bank.createUserAccount(firstName, lastName, dateOfBirth, userName, phoneNumber, hashedPassword) + "\n\n");
                     //Relogin Option
                     customerTypeSelected = false;
                     run();
@@ -94,7 +95,8 @@ public class NewBankClientHandler extends Thread {
 
             boolean passwordMatch = PasswordHash.validatePassword(password, storedHashedPassword);
             if (!passwordMatch) {
-                out.println("Incorrect password.\n");
+                out.println("Invalid Credentials, please try again.\n");
+                //Relogin Option
                 customerTypeSelected = false;
                 run();
             }
@@ -185,7 +187,7 @@ public class NewBankClientHandler extends Thread {
                             out.println(bank.createBankAccount(customer, accountType) + "\n\n");
                             continue;
                         case "7":
-                            out.println("To be filled\n");
+                            out.println("Upcoming Feature.\n");
                             continue;
                         case "8":
                             out.println("Thank you. Bye.\n");
