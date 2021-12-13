@@ -63,23 +63,45 @@ public class NewBank {
         }
     }
 
-    public Customer getCustomer(String email, String password) {
-
-        String sql = "SELECT * FROM customer WHERE email = ? AND password = ? ";
-        System.out.println("Login Request for email: " + email + ", password: " + password);
-
+    public String getHashedPassword(String email) {
+        String sql = "SELECT password FROM customer WHERE email = ?";
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // set the value
             pstmt.setString(1, email);
-            pstmt.setString(2, password);
+            //Execute query
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.isBeforeFirst()) {
+                System.out.println("User not found");
+                return null;
+            } else {
+                return rs.getString("password");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Customer getCustomer(String email) {
+
+        String sql = "SELECT * FROM customer WHERE email = ?";
+        System.out.println("Login Request for email: " + email);
+
+        try (Connection conn = this.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // set the value
+            pstmt.setString(1, email);
+            //pstmt.setString(2, password);
 
             //Execute query
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.isBeforeFirst()) {
-                System.out.println("Email/Password combination not found");
+                System.out.println("Email not found");
                 return null;
             } else {
                 Customer customer = new Customer();
