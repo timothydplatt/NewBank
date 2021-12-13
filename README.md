@@ -43,6 +43,7 @@ PasswordHash Class: Has functionalities for hashing user’s credentials, valida
 - Function validatePassword() verifies a string value and its respective hash value
 
 Loan Class: Used for handling loan functionalities for bank. It has features like loan request, loan approval and loan repayment.
+
 initializeBankDatabase Class: Constitutes for initializing SQL Lite database tables account and customer, and add dummy data into respective tables.
 
 ## Components
