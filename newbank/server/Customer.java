@@ -1,6 +1,11 @@
 package server;
 
 public class Customer {
+
+	/**
+	 *Customer Class: For creating respective class objects.
+	 */
+
 	public int id;
 	public String firstName;
 	public String lastName;

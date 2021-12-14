@@ -7,6 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class initializeBankDatabase {
+
+    /**
+     * initializeBankDatabase Class: Constitutes for initializing SQL Lite database tables account and customer, and add dummy data into respective tables.
+     */
+
     public initializeBankDatabase() {
         Connection connection = null;
         try {
@@ -54,10 +59,12 @@ public class initializeBankDatabase {
             Thread.sleep(2000);
 
             //Insert Sample Data
-            statement.executeUpdate("insert into customer (firstName, LastName, dateOfBirth, email, phoneNumber, password) VALUES ('Johnny', 'Bravo', '01/01/1995', 'johnny@gmail.com', 07777777777, 'johnny123')");
+            statement.executeUpdate("insert into customer (firstName, LastName, dateOfBirth, email, phoneNumber, password) VALUES ('Johnny', 'Bravo', '01/01/1995', 'johnny@gmail.com', 07777777777, '1000:edc40a4e16834751005144df4706a2672cac5dc4b9a6c1e6:c69777db0f1681e09bfa2e7080b9294f1c8e4a9c83c53ca6')");
+            /*user/pass johnny@gmail.com/johnny123*/
             statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1001, 100, 'Current', '01/01/2021')");
             statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1001, 299.99, 'Savings', '03/01/2021')");
-            statement.executeUpdate("insert into customer (firstName, LastName, dateOfBirth, email, phoneNumber, password) VALUES ('Popeye', 'Sailor Man', '31/01/1929', 'popeye@gmail.com', 07926535905, 'popeye123')");
+            statement.executeUpdate("insert into customer (firstName, LastName, dateOfBirth, email, phoneNumber, password) VALUES ('Popeye', 'Sailor Man', '31/01/1929', 'popeye@gmail.com', 07926535905, '1000:9ddd9261f0ca44681cb599df379ed980e3a2965c95dcfb2f:f80cd4a8646acacbb29db2fee7a33029cac0068c83946f18')");
+            /*user/pass popeye@gmail.com/popeye123*/
             statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1002, 599.98, 'Loan', '01/01/2021')");
             statement.executeUpdate("insert into account (customerID, balance, accountType, openDate) VALUES (1002, 1000, 'Savings', '05/12/2021')");
 

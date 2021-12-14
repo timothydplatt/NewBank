@@ -13,6 +13,14 @@ import java.security.spec.InvalidKeySpecException;
  * www: http://crackstation.net/hashing-security.htm
  */
 public class PasswordHash {
+
+    /**
+     * PasswordHash Class: Has functionalities for hashing user’s credentials, validating them
+     * 	Function createHash() returns a hashed value for a string input
+     * 	Function validatePassword() verifies a string value and its respective hash value
+     */
+
+
     public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
 
     // The following constants may be changed without breaking existing hashes.

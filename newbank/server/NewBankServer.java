@@ -6,6 +6,10 @@ import java.net.Socket;
 
 public class NewBankServer extends Thread {
 
+    /**
+     * NewBankServer Class: Exposing a http service on host and port localhost: 14004
+     */
+
     private ServerSocket server;
 
     public NewBankServer(int port) throws IOException {
