@@ -52,3 +52,10 @@ Java
 PBKDF2_ALGORITHM hashing algorithm
 
 SQL Lite Database - sqlite3
+
+## References
+The 'PasswordHash' class uses code from:
+ * Author: havoc AT defuse.ca
+ * www: http://crackstation.net/hashing-security.htm
+
+The author and source is referenced in the class file comments. 
